@@ -1,0 +1,114 @@
+:root{
+    --gb-51: #111827;
+    --gb-52: #2196f3;
+    --gb-52d: #0e71c1;
+}
+
+.cart-page {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 400px;
+}
+
+button {
+    display: block;
+    font-size: 12px;
+}
+
+table {
+    background: #EEE;
+    color: #024;
+}
+
+body:not(.show-cart-page) .cart-page,
+body.show-cart-page .other-page {
+    display: none;
+}
+
+.other-page {
+    text-wrap: nowrap;
+}
+
+/* Buttons */
+.gm-btn{
+    background: none;
+    border: none;
+    padding: 5px 15px;
+    font-size: 16px;
+    line-height: 24px;
+    transition: 0.3s;
+    cursor: pointer;
+    position: relative;
+    outline: none;
+}
+.gb-cutter::before,
+.gb-shutter::before,
+.gb-shutter::after,
+.gb-bordered::before
+{
+    content: "";
+    position: absolute;
+    z-index: -1;
+    transition: 0.5s;
+}
+/* cutter */
+
+.gb-cutter{
+    border: 2px solid var(--gb-51);
+    border-radius: 5px;
+    box-shadow: 3px 3px 0 var(--gb-51);
+    font-size: 1.125rem;
+    font-weight: 700;
+    overflow: hidden;
+    color: var(--gb-51);
+}
+.gb-cutter::before{
+    top: 100%;
+    left: 0;
+    width: 150%;
+    aspect-ratio: 1;
+    background: var(--gb-51);
+    transform: translate(50%,0%) rotateZ(-45deg);
+}
+.gb-cutter:hover::before{
+    transform: translate(-20%,-60%) rotateZ(-45deg);
+}
+.gb-cutter:hover{
+    box-shadow: 0 0 0;
+    color: #eee;
+}
+
+/* shutter */
+.gb-shutter{
+    border: 2px solid var(--gb-51);
+    border-radius: 5px;
+    box-shadow: 3px 3px 0 var(--gb-51);
+    font-size: 1.125rem;
+    font-weight: 700;
+    overflow: hidden;
+    color: var(--gb-51);
+}
+.gb-shutter::after, .gb-shutter::before{
+    top: 0;
+    left: 0;
+    width: 130%;
+    aspect-ratio: 1;
+    background: var(--gb-51);
+}
+.gb-shutter::after{
+    transform: translate(-100%,-80%) rotate(30deg);
+}
+.gb-shutter::before{
+    transform: translate(100%,30%) rotate(30deg);
+}
+.gb-shutter:hover::after{
+    transform: translate(-50%,-50%) rotate(30deg);
+}
+.gb-shutter:hover::before{
+    transform: translate(30%,-10%) rotate(30deg);
+}
+.gb-shutter:hover{
+    color: #eee;
+    box-shadow: 0 0 0;
+}
