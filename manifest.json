@@ -1,23 +1,23 @@
 {
   "manifest_version": 3,
   "name": "Troll&Toad Export",
-  "description": "Extension for Troll&Toad buyers",
+  "description": "Extensi1ón para compradores de Troll&Toad",
   "version": "1.0.0",
   "action": {
     "default_popup": "popup.html",
     "default_title": "Opciones de exportación",
     "default_icon": {
-      "16": "src/img/dragonite.jpg",
-      "48": "src/img/dragonite.jpg",
-      "128": "src/img/dragonite.jpg"
+      "16": "src/img/dragonite-128.jpg",
+      "48": "src/img/dragonite-128.jpg",
+      "128": "src/img/dragonite-128.jpg"
     }
   },
   "icons": {
-    "16": "src/img/dragonite.jpg",
-    "48": "src/img/dragonite.jpg",
-    "128": "src/img/dragonite.jpg"
+    "16": "src/img/dragonite-128.jpg",
+    "48": "src/img/dragonite-128.jpg",
+    "128": "src/img/dragonite-128.jpg"
   },
-  "permissions": ["storage", "tabs", "activeTab", "scripting"],
+  "permissions": ["tabs", "activeTab", "scripting"],
   "background": {
     "service_worker": "scripts/background.js"
   },
