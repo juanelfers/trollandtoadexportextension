@@ -12,12 +12,20 @@
     <div class="cart-page">
         <button class="copy-to-clipboard gm-btn gb-shutter">Copiar al portapapeles</button>
         <button class="copy-and-open gm-btn gb-shutter">Copiar y abrir nuevo Excel</button>
+        <button class="import-from-clipboard gm-btn gb-shutter">Importar</button>
     </div>
     
     <div class="other-page">
-        Esta extensión sólo funciona en el cart the TrollAndToad
-    </div>
+        <button class="import-from-clipboard gm-btn gb-shutter">Importar</button>
 
+        <!-- 
+            Esta extensión sólo funciona en el cart the TrollAndToad
+        -->
+    </div>
+    
+    <div class="import-progress"></div>
+
+    <script type="module" src="scripts/lib/xlsx.min.js"></script>
     <script type="module" src="scripts/popup.js"></script>
 </body>
 </html>

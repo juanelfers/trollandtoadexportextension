@@ -1,5 +1,3 @@
-const table = document.querySelector('table tbody');
-
 (async function () {
     const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
@@ -23,7 +21,6 @@ function getArticles() {
     const articles = document.querySelectorAll('.cart-item');
     const productsArray = [];
 
-    // Itera sobre cada artículo
     articles.forEach((article) => {
         const name = article.querySelector('.item-name').textContent.trim();
         const price = article.querySelector('.font-smaller .sale-price').textContent.trim().replace('.', ',');
@@ -45,7 +42,7 @@ function getArticles() {
     return productsArray
 }
 
-const getRow = (index) => String.fromCharCode(65 + Math.floor(Math.abs(numero)));
+const getRow = (index) => String.fromCharCode(65 + Math.floor(Math.abs(index)));
 const getFormula = index => `=C${index + 2}*D${index + 2}`;
 const getTotalFormula = productsLength => `=SUM(E2:E${productsLength + 1})`;
 const getProductsBody = products => products.map((product, index) => `
@@ -99,5 +96,116 @@ async function copyAndOpen() {
     copy();
 }
 
+function exportTable() {
+    const tabla = document.querySelector('#cart table');
+    const libroDeTrabajo = XLSX.utils.book_new();
+    const hojaDeCalculo = XLSX.utils.table_to_sheet(tabla);
+    XLSX.utils.book_append_sheet(libroDeTrabajo, hojaDeCalculo, 'Hoja1');
+    XLSX.writeFile(libroDeTrabajo, 'miArchivo.xlsx');
+}
+
+function importFromClipboard() {
+    const input = window.prompt('Pegar tabla de Excel');
+    if (!input) return;
+
+    const data = input.split('\r\n').map(l => {
+        const [card, url, price, quantity] = l.split('\t');
+        if (!url.match(/http/)) return null;
+        return { card, url, price: +price.replace(',', '.'), quantity };
+    }).filter(Boolean);
+
+    console.log({ data })
+
+    chrome.tabs.query(
+        { active: true, currentWindow: true },
+        ([tab]) => navigateCards(tab.id, data, 0)
+    );
+
+    document.querySelector('.cart-page').style.display = 'none';
+    document.querySelector('.other-page').style.display = 'none';
+
+    const cards = data.map(({card, quantity}) => `
+        <div>${card.slice(0, 10).trim()}... x${quantity}: <em>Pendiente</em></div>
+    `).join('');
+
+    document.querySelector('.import-progress').innerHTML = cards;
+}
+
+const wait = (time = 1000) => new Promise(resolve => setTimeout(resolve, time))
+
+const navigateTo = (tabId, url) => new Promise(resolve => {
+    let updated = false;
+
+    chrome.tabs.update(tabId, { url });
+
+    chrome.tabs.onUpdated.addListener((updatedTabId, changeInfo) => {
+        if (!updated && updatedTabId === tabId && changeInfo.status === 'complete') {
+            updated = true;
+            resolve();
+        }
+    })
+})
+
+const handleAddToCart = async (card) => {
+    console.log({ card })
+    console.log('Adding to cart', document.querySelectorAll('.buyOptionRow').length);
+
+    Array.from(document.querySelectorAll('.buyOptionRow')).find(option => {
+        console.log({ option })
+
+        const priceCol = option.querySelector('.priceCol');
+
+        console.log({ priceCol })
+
+        if (!priceCol) return
+
+        const price = +priceCol.textContent.slice(1);
+
+        console.log({ price, cardPrice: card.price });
+
+        if (price !== card.price) return;
+
+        option.querySelector('.qtySelect').value = card.quantity;
+        option.querySelector('.cartAdd').click();
+
+        return true;
+    })
+
+    console.log('handleAddToCartEnd')
+
+    return true;
+};
+
+async function navigateCards(tabId, data, index) {
+    if (index >= data.length) {
+        navigateTo(tabId, 'https://www.trollandtoad.com/cart')
+        return;
+    }
+
+    const status = document.querySelectorAll('.import-progress div')[index].querySelector('em');
+    status.innerText = 'Agregando...'
+    const card = data[index];
+    const { url } = card;
+
+    await navigateTo(tabId, url)
+
+    console.log('- Update finished. Waiting', tabId)
+
+    const res = await chrome.scripting.executeScript({
+        target: { tabId },
+        func: handleAddToCart,
+        args: [card]
+    });
+
+    await wait(1000);
+
+    status.innerText = 'Listo!'
+
+    console.log({ res });
+
+    navigateCards(tabId, data, index + 1)
+}
+
 document.querySelector('.copy-to-clipboard').addEventListener('click', copy);
 document.querySelector('.copy-and-open').addEventListener('click', copyAndOpen);
+document.querySelectorAll('.import-from-clipboard').forEach(button => button.addEventListener('click', importFromClipboard));

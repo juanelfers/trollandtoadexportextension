@@ -17,7 +17,7 @@
     "48": "src/img/dragonite-128.jpg",
     "128": "src/img/dragonite-128.jpg"
   },
-  "permissions": ["tabs", "activeTab", "scripting"],
+  "permissions": ["tabs", "activeTab", "scripting", "declarativeContent"],
   "background": {
     "service_worker": "scripts/background.js"
   },
@@ -26,5 +26,8 @@
       "matches": ["https://www.trollandtoad.com/cart"],
       "js": ["scripts/content.js"]
     }
+  ],
+  "host_permissions": [
+    "https://www.trollandtoad.com/*"
   ]
 }
