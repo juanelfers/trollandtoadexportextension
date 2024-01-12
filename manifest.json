@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Troll&Toad Export",
-  "description": "Extensi1ón para compradores de Troll&Toad",
+  "description": "Extensión para compradores de Troll&Toad",
   "version": "1.0.0",
   "action": {
     "default_popup": "popup.html",
