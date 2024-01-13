@@ -223,13 +223,14 @@ function end(tabId, cards) {
     const summary = `
         <h4>Resumen:</h4>
         ${successTotal}/${total} agregados
-        ${errorTotal && (`
+        ${!!errorTotal && (`
             <h5>Faltantes</h5>
             ${missing.map(card => `
                 <div>${card.name.slice(0, 15).trim()}... ${card.quantity} x $${card.price}</div>
             `)}
         `)}
     `;
+    
     document.querySelector('.summary').innerHTML = summary;
 }
 
