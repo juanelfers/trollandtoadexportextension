@@ -129,9 +129,9 @@ function importFromClipboard() {
 
     const lineSplit = input.match('\r') ? '\r\n' : '\n';
     const data = input.split(lineSplit).map(l => {
-        const [card, url, price, quantity] = l.split('\t');
+        const [name, url, price, quantity] = l.split('\t');
         if (!url.match(/http/)) return null;
-        return { card, url, price: +price.replace(',', '.'), quantity };
+        return { name, url, price: +price.replace(',', '.'), quantity };
     }).filter(Boolean);
 
     chrome.tabs.query(
@@ -142,11 +142,11 @@ function importFromClipboard() {
     document.querySelector('.cart-page').style.display = 'none';
     document.querySelector('.other-page').style.display = 'none';
 
-    const cards = data.map(({ card, quantity }) => `
-        <div class="card-progress">${card.slice(0, 10).trim()}... x${quantity}: <span class="card-status">Pendiente</span></div>
+    const cards = data.map(({ name, quantity }) => `
+        <div class="card-progress">${name.slice(0, 10).trim()}... x${quantity}: <span class="card-status">Pendiente</span></div>
     `).join('');
 
-    
+
     document.querySelector('.import-page').classList.remove('hidden');
     document.querySelector('.import-progress').innerHTML = cards;
 }
@@ -207,23 +207,48 @@ const updateCard = (index) => {
             document.querySelector('.progress').style.width = `${parseInt((index + 1) / cards.length * 100)}%`;
         },
         error: (errMsg) => {
-            status.innerText = 'Error adding'
+            status.innerText = 'Sin stock'
             card.classList.add('error');
         }
     }
 }
 
-async function navigateCards(tabId, data, index) {
-    if (index >= data.length) {
-        navigateTo(tabId, 'https://www.trollandtoad.com/cart')
-        return;
+function end(tabId, cards) {
+    navigateTo(tabId, 'https://www.trollandtoad.com/cart');
+
+    const total = cards.length;
+    const missing = cards.filter(card => card.error);
+    const errorTotal = missing.length;
+    const successTotal = total - errorTotal;
+    const summary = `
+        <h4>Resumen:</h4>
+        ${successTotal}/${total} agregados
+        ${errorTotal && (`
+            <h5>Faltantes</h5>
+            ${missing.map(card => `
+                <div>${card.name.slice(0, 15).trim()}... ${card.quantity} x $${card.price}</div>
+            `)}
+        `)}
+    `;
+    document.querySelector('.summary').innerHTML = summary;
+}
+
+document.addEventListener('click', event => {
+    const { target } = event
+    if (target?.tagName.toLowerCase() === 'a') {
+        chrome.tabs.create({ url: target.getAttribute('href') });
     }
+});
+
+async function navigateCards(tabId, data, index) {
+    if (index >= data.length) return end(tabId, data);
 
     const update = updateCard(index);
     const card = data[index];
     const { url } = card;
 
     await navigateTo(tabId, url)
+    await wait();
 
     const [{ result }] = await chrome.scripting.executeScript({
         target: { tabId },
@@ -232,9 +257,10 @@ async function navigateCards(tabId, data, index) {
     });
 
     if (result.success) {
-        await wait(1000);
+        await wait();
         update.success(data, index);
     } else {
+        data[index].error = true;
         update.error();
     }
 
@@ -243,5 +269,4 @@ async function navigateCards(tabId, data, index) {
 
 document.querySelector('.copy-to-clipboard').addEventListener('click', copy);
 document.querySelector('.copy-and-open').addEventListener('click', copyAndOpen);
-document.querySelector('.download').addEventListener('click', exportTable);
 document.querySelectorAll('.import-from-clipboard').forEach(button => button.addEventListener('click', importFromClipboard));

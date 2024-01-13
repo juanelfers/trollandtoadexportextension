@@ -4,6 +4,10 @@
     --gb-52d: #0e71c1;
 }
 
+h4, h5 {
+    margin: 10px 0 0;
+}
+
 .cart-page {
     display: flex;
     flex-direction: column;
