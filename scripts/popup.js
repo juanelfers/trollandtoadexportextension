@@ -97,24 +97,42 @@ async function copyAndOpen() {
 }
 
 function exportTable() {
-    const tabla = document.querySelector('#cart table');
-    const libroDeTrabajo = XLSX.utils.book_new();
-    const hojaDeCalculo = XLSX.utils.table_to_sheet(tabla);
-    XLSX.utils.book_append_sheet(libroDeTrabajo, hojaDeCalculo, 'Hoja1');
-    XLSX.writeFile(libroDeTrabajo, 'miArchivo.xlsx');
+    const table = document.querySelector('#cart table');
+    const workBook = XLSX.utils.book_new();
+
+    // Obtener los datos como una matriz de arreglos (AOA)
+    const aoa = [];
+    const rows = table.querySelectorAll('tr');
+
+    rows.forEach(row => {
+        const rowData = [];
+        const cells = row.querySelectorAll('td');
+
+        cells.forEach(cell => {
+            rowData.push(cell.textContent);
+        });
+
+        aoa.push(rowData);
+    });
+
+    // Crear hoja de cálculo y agregar datos
+    const sheet = XLSX.utils.aoa_to_sheet(aoa);
+    XLSX.utils.book_append_sheet(workBook, sheet, 'Troll&Toad');
+
+    // Escribir el archivo
+    XLSX.writeFile(workBook, 'TrollAndToad.xlsx');
 }
 
 function importFromClipboard() {
     const input = window.prompt('Pegar tabla de Excel');
     if (!input) return;
 
-    const data = input.split('\r\n').map(l => {
+    const lineSplit = input.match('\r') ? '\r\n' : '\n';
+    const data = input.split(lineSplit).map(l => {
         const [card, url, price, quantity] = l.split('\t');
         if (!url.match(/http/)) return null;
         return { card, url, price: +price.replace(',', '.'), quantity };
     }).filter(Boolean);
-
-    console.log({ data })
 
     chrome.tabs.query(
         { active: true, currentWindow: true },
@@ -124,10 +142,12 @@ function importFromClipboard() {
     document.querySelector('.cart-page').style.display = 'none';
     document.querySelector('.other-page').style.display = 'none';
 
-    const cards = data.map(({card, quantity}) => `
-        <div>${card.slice(0, 10).trim()}... x${quantity}: <em>Pendiente</em></div>
+    const cards = data.map(({ card, quantity }) => `
+        <div class="card-progress">${card.slice(0, 10).trim()}... x${quantity}: <span class="card-status">Pendiente</span></div>
     `).join('');
 
+    
+    document.querySelector('.import-page').classList.remove('hidden');
     document.querySelector('.import-progress').innerHTML = cards;
 }
 
@@ -147,34 +167,51 @@ const navigateTo = (tabId, url) => new Promise(resolve => {
 })
 
 const handleAddToCart = async (card) => {
-    console.log({ card })
-    console.log('Adding to cart', document.querySelectorAll('.buyOptionRow').length);
+    let response = {
+        success: false
+    };
 
-    Array.from(document.querySelectorAll('.buyOptionRow')).find(option => {
-        console.log({ option })
+    const optionRows = Array.from(document.querySelectorAll('.buyOptionRow'));
 
+    optionRows.find(option => {
         const priceCol = option.querySelector('.priceCol');
-
-        console.log({ priceCol })
 
         if (!priceCol) return
 
         const price = +priceCol.textContent.slice(1);
-
-        console.log({ price, cardPrice: card.price });
 
         if (price !== card.price) return;
 
         option.querySelector('.qtySelect').value = card.quantity;
         option.querySelector('.cartAdd').click();
 
+        response = {
+            success: true
+        };
+
         return true;
-    })
+    });
 
-    console.log('handleAddToCartEnd')
-
-    return true;
+    return response;
 };
+
+const updateCard = (index) => {
+    const card = document.querySelectorAll('.import-progress div')[index];
+    const status = card.querySelector('span');
+    status.innerText = 'Agregando...'
+
+    return {
+        success: (cards, index) => {
+            status.innerText = 'Listo!'
+            card.classList.add('success');
+            document.querySelector('.progress').style.width = `${parseInt((index + 1) / cards.length * 100)}%`;
+        },
+        error: (errMsg) => {
+            status.innerText = 'Error adding'
+            card.classList.add('error');
+        }
+    }
+}
 
 async function navigateCards(tabId, data, index) {
     if (index >= data.length) {
@@ -182,30 +219,29 @@ async function navigateCards(tabId, data, index) {
         return;
     }
 
-    const status = document.querySelectorAll('.import-progress div')[index].querySelector('em');
-    status.innerText = 'Agregando...'
+    const update = updateCard(index);
     const card = data[index];
     const { url } = card;
 
     await navigateTo(tabId, url)
 
-    console.log('- Update finished. Waiting', tabId)
-
-    const res = await chrome.scripting.executeScript({
+    const [{ result }] = await chrome.scripting.executeScript({
         target: { tabId },
         func: handleAddToCart,
         args: [card]
     });
 
-    await wait(1000);
-
-    status.innerText = 'Listo!'
-
-    console.log({ res });
+    if (result.success) {
+        await wait(1000);
+        update.success(data, index);
+    } else {
+        update.error();
+    }
 
     navigateCards(tabId, data, index + 1)
 }
 
 document.querySelector('.copy-to-clipboard').addEventListener('click', copy);
 document.querySelector('.copy-and-open').addEventListener('click', copyAndOpen);
+document.querySelector('.download').addEventListener('click', exportTable);
 document.querySelectorAll('.import-from-clipboard').forEach(button => button.addEventListener('click', importFromClipboard));

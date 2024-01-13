@@ -8,22 +8,23 @@
     <link rel="stylesheet" href="src/styles/popup.css">
 </head>
 <body>
-    
     <div class="cart-page">
         <button class="copy-to-clipboard gm-btn gb-shutter">Copiar al portapapeles</button>
         <button class="copy-and-open gm-btn gb-shutter">Copiar y abrir nuevo Excel</button>
+        <!--  <button class="download gm-btn gb-shutter">Descargar Excel</button> -->
         <button class="import-from-clipboard gm-btn gb-shutter">Importar</button>
     </div>
     
     <div class="other-page">
         <button class="import-from-clipboard gm-btn gb-shutter">Importar</button>
-
-        <!-- 
-            Esta extensión sólo funciona en el cart the TrollAndToad
-        -->
     </div>
-    
-    <div class="import-progress"></div>
+
+    <div class="import-page hidden">
+        <div class="import-progress-bar">
+            <div class="progress"></div>
+        </div>
+        <div class="import-progress"></div>
+    </div>
 
     <script type="module" src="scripts/lib/xlsx.min.js"></script>
     <script type="module" src="scripts/popup.js"></script>

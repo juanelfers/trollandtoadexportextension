@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Troll&Toad Export",
   "description": "Extensión para compradores de Troll&Toad",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "action": {
     "default_popup": "popup.html",
     "default_title": "Opciones de exportación",
@@ -17,7 +17,7 @@
     "48": "src/img/dragonite-128.jpg",
     "128": "src/img/dragonite-128.jpg"
   },
-  "permissions": ["tabs", "activeTab", "scripting", "declarativeContent"],
+  "permissions": ["tabs", "activeTab", "scripting"],
   "background": {
     "service_worker": "scripts/background.js"
   },

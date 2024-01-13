@@ -21,9 +21,70 @@ table {
     color: #024;
 }
 
+.hidden {
+    display: none;
+}
+
+.import-progress-bar {
+    height: 6px;
+    border-radius: 5px;
+    padding: 2px;
+    background: #CCC;
+    margin-bottom: 10px;
+}
+
+.import-progress-bar .progress {
+    transition: width .5s;
+    background: #2A7;
+    width: 0;
+    height: 100%;
+    border-radius: 5px;
+}
+
 body:not(.show-cart-page) .cart-page,
 body.show-cart-page .other-page {
     display: none;
+}
+
+.import-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 200px;
+}
+
+.card-progress {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.card-progress :last-child {
+    margin-left: auto;
+}
+
+.card-progress::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #AAA;
+}
+
+.card-progress.success::before {
+    background: #396;
+}
+
+.card-progress.error::before {
+    background: #C30;
+}
+
+.card-progress.success {
+    color: #396;
+}
+
+.card-progress.error {
+    color: #AAA;
 }
 
 .import-progress,
