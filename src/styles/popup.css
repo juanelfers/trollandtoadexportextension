@@ -1,13 +1,16 @@
-:root{
+:root {
     --gb-51: #111827;
     --gb-52: #2196f3;
     --gb-52d: #0e71c1;
 }
 
-h4, h5 {
+/* Headings */
+h4,
+h5 {
     margin: 10px 0 0;
 }
 
+/* Cart Page */
 .cart-page {
     display: flex;
     flex-direction: column;
@@ -15,20 +18,24 @@ h4, h5 {
     width: 400px;
 }
 
+/* Buttons */
 button {
     display: block;
     font-size: 12px;
 }
 
+/* Table */
 table {
     background: #EEE;
     color: #024;
 }
 
+/* Hidden Element */
 .hidden {
     display: none;
 }
 
+/* Import Progress Bar */
 .import-progress-bar {
     height: 6px;
     border-radius: 5px;
@@ -45,11 +52,13 @@ table {
     border-radius: 5px;
 }
 
+/* Conditional Display */
 body:not(.show-cart-page) .cart-page,
 body.show-cart-page .other-page {
     display: none;
 }
 
+/* Import Progress */
 .import-progress {
     display: flex;
     flex-direction: column;
@@ -57,6 +66,7 @@ body.show-cart-page .other-page {
     width: 200px;
 }
 
+/* Card Progress */
 .card-progress {
     display: flex;
     gap: 10px;
@@ -91,13 +101,14 @@ body.show-cart-page .other-page {
     color: #AAA;
 }
 
+/* Text Wrap */
 .import-progress,
 .other-page {
     text-wrap: nowrap;
 }
 
-/* Buttons */
-.gm-btn{
+/* Buttons Styles */
+.gm-btn {
     background: none;
     border: none;
     padding: 5px 15px;
@@ -108,19 +119,20 @@ body.show-cart-page .other-page {
     position: relative;
     outline: none;
 }
+
+/* General Button Styles - Shared Pseudo-elements */
 .gb-cutter::before,
 .gb-shutter::before,
 .gb-shutter::after,
-.gb-bordered::before
-{
+.gb-bordered::before {
     content: "";
     position: absolute;
     z-index: -1;
     transition: 0.5s;
 }
-/* cutter */
 
-.gb-cutter{
+/* Cutter Button Styles */
+.gb-cutter {
     border: 2px solid var(--gb-51);
     border-radius: 5px;
     box-shadow: 3px 3px 0 var(--gb-51);
@@ -129,24 +141,27 @@ body.show-cart-page .other-page {
     overflow: hidden;
     color: var(--gb-51);
 }
-.gb-cutter::before{
+
+.gb-cutter::before {
     top: 100%;
     left: 0;
     width: 150%;
     aspect-ratio: 1;
     background: var(--gb-51);
-    transform: translate(50%,0%) rotateZ(-45deg);
+    transform: translate(50%, 0%) rotateZ(-45deg);
 }
-.gb-cutter:hover::before{
-    transform: translate(-20%,-60%) rotateZ(-45deg);
+
+.gb-cutter:hover::before {
+    transform: translate(-20%, -60%) rotateZ(-45deg);
 }
-.gb-cutter:hover{
+
+.gb-cutter:hover {
     box-shadow: 0 0 0;
     color: #eee;
 }
 
-/* shutter */
-.gb-shutter{
+/* Shutter Button Styles */
+.gb-shutter {
     border: 2px solid var(--gb-51);
     border-radius: 5px;
     box-shadow: 3px 3px 0 var(--gb-51);
@@ -155,26 +170,33 @@ body.show-cart-page .other-page {
     overflow: hidden;
     color: var(--gb-51);
 }
-.gb-shutter::after, .gb-shutter::before{
+
+.gb-shutter::after,
+.gb-shutter::before {
     top: 0;
     left: 0;
     width: 130%;
     aspect-ratio: 1;
     background: var(--gb-51);
 }
-.gb-shutter::after{
-    transform: translate(-100%,-80%) rotate(30deg);
+
+.gb-shutter::after {
+    transform: translate(-100%, -80%) rotate(30deg);
 }
-.gb-shutter::before{
-    transform: translate(100%,30%) rotate(30deg);
+
+.gb-shutter::before {
+    transform: translate(100%, 30%) rotate(30deg);
 }
-.gb-shutter:hover::after{
-    transform: translate(-50%,-50%) rotate(30deg);
+
+.gb-shutter:hover::after {
+    transform: translate(-50%, -50%) rotate(30deg);
 }
-.gb-shutter:hover::before{
-    transform: translate(30%,-10%) rotate(30deg);
+
+.gb-shutter:hover::before {
+    transform: translate(30%, -10%) rotate(30deg);
 }
-.gb-shutter:hover{
+
+.gb-shutter:hover {
     color: #eee;
     box-shadow: 0 0 0;
 }
