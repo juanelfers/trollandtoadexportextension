@@ -71,6 +71,7 @@ body.show-cart-page .other-page {
     display: flex;
     gap: 10px;
     align-items: center;
+    transition: .3s;
 }
 
 .card-progress :last-child {
@@ -83,6 +84,11 @@ body.show-cart-page .other-page {
     height: 10px;
     border-radius: 50%;
     background: #AAA;
+    transition: .3s;
+}
+
+.card-progress.adding::before {
+    background: #FC3;
 }
 
 .card-progress.success::before {
@@ -91,6 +97,10 @@ body.show-cart-page .other-page {
 
 .card-progress.error::before {
     background: #C30;
+}
+
+.card-progress.adding {
+    color: #FC3;
 }
 
 .card-progress.success {

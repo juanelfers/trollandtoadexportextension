@@ -1,3 +1,5 @@
+import { navigateTo } from './navigateTo.js';
+
 const wait = (time = 1000) => new Promise(resolve => setTimeout(resolve, time))
 
 const handleAddToCart = async (card) => {
@@ -53,7 +55,7 @@ async function navigateCards(tabId, cards, index) {
         update.error();
     }
 
-    update.finally();
+    update.finally(cards, index);
 
     navigateCards(tabId, cards, index + 1)
 }
@@ -62,7 +64,8 @@ const updateCard = (cards, index) => {
     const card = document.querySelectorAll('.import-progress div')[index];
     const status = card.querySelector('span');
     status.innerText = 'Agregando...'
-
+    card.classList.add('adding');
+    
     return {
         success: () => {
             status.innerText = 'Listo!'
@@ -73,6 +76,7 @@ const updateCard = (cards, index) => {
             card.classList.add('error');
         },
         finally: (cards, index) => {
+            card.classList.remove('adding');
             document.querySelector('.progress').style.width = `${parseInt((index + 1) / cards.length * 100)}%`;
         }
     }
@@ -88,13 +92,13 @@ function end(tabId, cards) {
     const summary = `
         <h4>Resumen:</h4>
         ${successTotal}/${total} agregados
-        ${!!errorTotal && (`
+        ${errorTotal ? (`
             <h5>Faltantes</h5>
             ${missing.map(card => `
                 <div>${card.name.slice(0, 15).trim()}... ${card.quantity} x $${card.price}</div>
             `).join()}
             <!-- <button>Copiar excel con faltantes</button> -->
-        `)}
+        `) : ''}
     `;
     
     document.querySelector('.summary').innerHTML = summary;
