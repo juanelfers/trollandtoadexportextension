@@ -23,3 +23,11 @@ export function bindEvents({ copy, copyAndOpen, importFromClipboard }) {
         elem.forEach(button => button.addEventListener('click', onClick));
     });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const links = document.querySelectorAll('a');
+
+    links.forEach(link => {
+        link.addEventListener('click', () => chrome.tabs.create({ url: link.href }));
+    });
+});

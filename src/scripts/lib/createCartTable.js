@@ -1,13 +1,35 @@
-function getArticles() {
-    const articles = document.querySelectorAll('.cart-item');
+export const wait = (time = 1000) => new Promise(resolve => setTimeout(resolve, time))
+
+function getArticles(page = 'tcgplayer') {
+    const selectors = {
+        trolltoad: {
+            item: '.cart-item',
+            name: '.item-name',
+            price: '.font-smaller .sale-price',
+            productLink: '.font-weight-bold .item-name',
+            imageUrl: '.product-img-container a img',
+            quantity: '.qty-input select',
+        },
+        tcgplayer: {
+            item: '.package-item',
+            name: '.name',
+            price: '.price',
+            productLink: '.expanded-details a',
+            imageUrl: '.image-wrapper img',
+            quantity: '.mp-select select',
+        }
+    };
+
+    const selector = selectors[page];
+    const articles = document.querySelectorAll(selector.item);
     const productsArray = [];
 
     articles.forEach((article) => {
-        const name = article.querySelector('.item-name').textContent.trim();
-        const price = article.querySelector('.font-smaller .sale-price').textContent.trim().replace('.', ',');
-        const productLink = article.querySelector('.font-weight-bold .item-name').getAttribute('href');
-        const imageUrl = article.querySelector('.product-img-container a img').getAttribute('src');
-        const quantity = article.querySelector('.qty-input select').value;
+        const name = article.querySelector(selector.name).textContent.trim();
+        const price = article.querySelector(selector.price).textContent.trim().replace('.', ',').replace('$', '');
+        const productLink = article.querySelector(selector.productLink).getAttribute('href');
+        const imageUrl = article.querySelector(selector.imageUrl).getAttribute('src');
+        const quantity = article.querySelector(selector.quantity).value;
 
         const productObject = {
             name,
@@ -58,14 +80,23 @@ const getTableHTML = (products) => `
 
 export const createCartTable = async function () {
     const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!currentTab) return;
 
-    if (!(currentTab?.url.includes('https://www.trollandtoad.com/cart'))) return;
+    const carts = {
+        trolltoad: 'https://www.trollandtoad.com/cart',
+        tcgplayer: 'https://www.tcgplayer.com/cart',
+    };
+
+    const [platform] = Object.entries(carts).find(([_, url]) => currentTab.url.includes(url))
+
+    if (!platform) return;
 
     document.body.classList.add('show-cart-page');
 
     const [{ result }] = await chrome.scripting.executeScript({
         target: { tabId: currentTab.id },
-        func: getArticles
+        func: getArticles,
+        args : [platform],
     });
 
     const container = document.createElement('div');

@@ -1,6 +1,6 @@
 import { navigateTo } from './navigateTo.js';
 
-const wait = (time = 1000) => new Promise(resolve => setTimeout(resolve, time))
+export const wait = (time = 1000) => new Promise(resolve => setTimeout(resolve, time))
 
 const handleAddToCart = async (card) => {
     let response = {
@@ -96,7 +96,7 @@ function end(tabId, cards) {
             <h5>Faltantes</h5>
             ${missing.map(card => `
                 <div>${card.name.slice(0, 15).trim()}... ${card.quantity} x $${card.price}</div>
-            `).join()}
+            `).join('')}
             <!-- <button>Copiar excel con faltantes</button> -->
         `) : ''}
     `;

@@ -1,0 +1,17 @@
+{
+  "name": "toadtrolltosheet",
+  "version": "1.0.0",
+  "description": "This extension reads your card collection from pokellector.com so it can detect easily which cards you have on other websites, usually websites that sell these cards",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "wlogin": "wrangler login"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chrome-webstore-upload": "^3.0.3",
+    "wrangler": "^3.24.0"
+  }
+}
