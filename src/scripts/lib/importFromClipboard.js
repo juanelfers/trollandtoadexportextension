@@ -10,9 +10,14 @@ const handleAddToCart = async (card) => {
     try {
         if (card.url.includes('ebay')) {
             const qty = document.querySelector('#qtyTextBox');
-            if (qty) qty.value = card.quantity;
+            if (qty) {
+                qty.value = card.quantity;
+                qty.dispatchEvent(new Event('input'));
+                qty.dispatchEvent(new Event('keyup'));
+            }
+
             document.querySelector('.x-atc-action a').click();
-            response = { success: true };
+            response = { success: true, wait: 500 };
         }
 
         if (card.url.includes('troll')) {
@@ -66,6 +71,10 @@ async function navigateCards(tabId, cards, index) {
 
     update.finally(cards, index);
 
+    if (result.wait) {
+        await wait(result.wait);
+    }
+
     navigateCards(tabId, cards, index + 1)
 }
 
@@ -92,7 +101,9 @@ const updateCard = (cards, index) => {
 }
 
 function end(tabId, cards) {
-    navigateTo(tabId, cards[0].url.includes('troll') ? 'https://www.trollandtoad.com/cart' : 'https://cart.ebay.com/');
+    if (cards[0].url.includes('troll')) {
+        navigateTo('https://www.trollandtoad.com/cart');
+    }
 
     const total = cards.length;
     const missing = cards.filter(card => card.error);
@@ -125,10 +136,10 @@ function parseInput(input) {
 
 export function importFromClipboard() {
     const input = window.prompt('Pegar tabla de Excel');
-    if (!input) return;
+    if (!input.trim()) return;
 
     const data = parseInput(input);
-    console.log({ data })
+
     chrome.tabs.query(
         { active: true, currentWindow: true },
         ([tab]) => navigateCards(tab.id, data, 0)

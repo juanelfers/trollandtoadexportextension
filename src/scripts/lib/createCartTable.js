@@ -12,10 +12,10 @@ function getProducts(page = 'tcgplayer', selectors) {
     const products = Array.from(articles).map((article) => {
         const name = article.querySelector(selector.name)?.textContent.trim();
         const quantity = +(article.querySelector(selector.quantity)?.value || 1);
-        const price = (divider(quantity) * article.querySelector(selector.price)?.textContent.trim().replace('$', '')).toString().replace('.', ',');
+        const price = (divider(quantity) * article.querySelector(selector.price)?.textContent.trim().replace(/[^0-9.]/g, '')).toString().replace('.', ',');
         const productLink = baseUrl + article.querySelector(selector.productLink)?.getAttribute('href');
         const imageUrl = baseUrl + article.querySelector(selector.imageUrl)?.getAttribute('src');
-
+        
         return {
             name,
             price,
@@ -24,18 +24,16 @@ function getProducts(page = 'tcgplayer', selectors) {
             imageUrl,
         };
     });
-    
+
     return products
 }
 
 export const createCartTable = async function () {
     const [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-    console.log({ currentTab })
     if (!currentTab) return;
 
     const [platform] = Object.entries(carts).find(([_, url]) => currentTab.url.includes(url)) || []
-    console.log({ platform })
 
     if (!platform) return;
 
