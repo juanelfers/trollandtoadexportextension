@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Troll&Toad Export",
   "description": "Extensión para compradores de Troll&Toad",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "action": {
     "default_popup": "src/popup.html",
     "default_title": "Troll&Toad Export",
@@ -29,6 +29,8 @@
   ],
   "host_permissions": [
     "https://www.trollandtoad.com/*",
-    "https://www.tcgplayer.com/*"
+    "https://www.tcgplayer.com/*",
+    "https://www.ebay.com/*",
+    "https://cart.ebay.com/*"
   ]
 }

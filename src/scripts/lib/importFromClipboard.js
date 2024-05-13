@@ -7,26 +7,35 @@ const handleAddToCart = async (card) => {
         success: false
     };
 
-    const optionRows = Array.from(document.querySelectorAll('.buyOptionRow'));
+    try {
+        if (card.url.includes('ebay')) {
+            const qty = document.querySelector('#qtyTextBox');
+            if (qty) qty.value = card.quantity;
+            document.querySelector('.x-atc-action a').click();
+            response = { success: true };
+        }
 
-    optionRows.find(option => {
-        const priceCol = option.querySelector('.priceCol');
+        if (card.url.includes('troll')) {
+            const optionRows = Array.from(document.querySelectorAll('.buyOptionRow'));
 
-        if (!priceCol) return
+            optionRows.find(option => {
+                const priceCol = option.querySelector('.priceCol');
 
-        const price = +priceCol.textContent.slice(1);
+                if (!priceCol) return
 
-        if (price !== card.price) return;
+                const price = +priceCol.textContent.slice(1);
 
-        option.querySelector('.qtySelect').value = card.quantity;
-        option.querySelector('.cartAdd').click();
+                if (price !== card.price) return;
 
-        response = {
-            success: true
-        };
+                option.querySelector('.qtySelect').value = card.quantity;
+                option.querySelector('.cartAdd').click();
 
-        return true;
-    });
+                response = { success: true };
+
+                return true;
+            });
+        }
+    } catch { }
 
     return response;
 };
@@ -65,7 +74,7 @@ const updateCard = (cards, index) => {
     const status = card.querySelector('span');
     status.innerText = 'Agregando...'
     card.classList.add('adding');
-    
+
     return {
         success: () => {
             status.innerText = 'Listo!'
@@ -83,7 +92,7 @@ const updateCard = (cards, index) => {
 }
 
 function end(tabId, cards) {
-    navigateTo(tabId, 'https://www.trollandtoad.com/cart');
+    navigateTo(tabId, cards[0].url.includes('troll') ? 'https://www.trollandtoad.com/cart' : 'https://cart.ebay.com/');
 
     const total = cards.length;
     const missing = cards.filter(card => card.error);
@@ -100,11 +109,11 @@ function end(tabId, cards) {
             <!-- <button>Copiar excel con faltantes</button> -->
         `) : ''}
     `;
-    
+
     document.querySelector('.summary').innerHTML = summary;
 }
 
-function parseInput (input) {
+function parseInput(input) {
     const lineSplit = input.match('\r') ? '\r\n' : '\n';
 
     return input.split(lineSplit).map(l => {
@@ -119,19 +128,22 @@ export function importFromClipboard() {
     if (!input) return;
 
     const data = parseInput(input);
-
+    console.log({ data })
     chrome.tabs.query(
         { active: true, currentWindow: true },
         ([tab]) => navigateCards(tab.id, data, 0)
     );
 
+    // Hide all non-import pages
     document.querySelector('.cart-page').style.display = 'none';
     document.querySelector('.other-page').style.display = 'none';
 
+    // Create list of cards
     const cards = data.map(({ name, quantity }) => `
         <div class="card-progress">${name.slice(0, 10).trim()}... x${quantity}: <span class="card-status">Pendiente</span></div>
     `).join('');
 
+    // Show import page and cards list
     document.querySelector('.import-page').classList.remove('hidden');
     document.querySelector('.import-progress').innerHTML = cards;
 }

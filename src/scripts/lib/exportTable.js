@@ -2,7 +2,6 @@ export function exportTable() {
     const table = document.querySelector('#cart table');
     const workBook = XLSX.utils.book_new();
 
-    // Obtener los datos como una matriz de arreglos (AOA)
     const aoa = [];
     const rows = table.querySelectorAll('tr');
 
